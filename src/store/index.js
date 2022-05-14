@@ -1,14 +1,21 @@
 import axios from "axios";
 import Vue from "vue";
 import Vuex from "vuex";
+import VuexPersist from "vuex-persist";
 
 Vue.use(Vuex);
+
+const vuexPersist = new VuexPersist({
+  key: "my-app",
+  storage: window.localStorage,
+});
 
 const uri = "https://trello.backend.tests.nekidaem.ru/api/v1";
 
 export default new Vuex.Store({
+  plugins: [vuexPersist.plugin],
   state: {
-    jwt: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo4OTYsInVzZXJuYW1lIjoiVmFzeWEiLCJleHAiOjE2NTI1NTY3NDAsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSIsIm9yaWdfaWF0IjoxNjUyNTUzMTQwfQ.YsXqfx2S4vhDmXP2fJT88hLJy9mQHpg-GtXOQ8EYQSY",
+    jwt: "",
     cards: [],
   },
   getters: {},

@@ -1,9 +1,9 @@
 <template>
-  <div id="column">
+  <div class="column">
     <div :style="{ backgroundColor: column.color }">
-      {{ column.name }}
+      {{ column.name }} ({{ amount }})
     </div>
-    <div id="card" v-for="card in cards" :key="card.id">
+    <div class="card" v-for="card in cards" :key="card.id">
       <p>id: {{ card.id }}</p>
       <p>{{ card.text }}</p>
     </div>
@@ -14,7 +14,7 @@
       v-model="todoText"
       v-show="isAdded"
     />
-    <div id="add-field">
+    <div class="add-field">
       <div class="add" :class="{ 'active-add': isAdded }" @click="add">
         <span>+</span> Добавить карточку
       </div>
@@ -50,16 +50,21 @@ export default {
       this.isAdded = false;
     },
   },
+  computed: {
+    amount() {
+      return this.cards.length;
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-#column {
+.column {
   width: 100%;
   margin: 0 10px;
   text-align: left;
 
-  & > div:not(#add-field),
+  > div:not(.add-field),
   textarea {
     padding: 10px;
   }
@@ -78,11 +83,11 @@ export default {
     }
   }
 
-  #card {
+  .card {
     background: #000;
     border: 10px solid #272930;
   }
-  #add-field {
+  .add-field {
     background: #272930;
     display: flex;
     font-size: 1.2rem;
@@ -94,24 +99,27 @@ export default {
       background: #272930;
       color: gray;
       cursor: pointer;
+      text-align: left;
     }
     .active-add {
       background: #535353;
       color: #a9a9a9;
       padding: 15px 0;
+      text-align: center;
 
       span {
-        opacity: 0;
+        display: none;
       }
     }
 
     button {
       width: 30%;
-      padding: 0;
+      padding-left: 20px;
       color: #a9a9a9;
       background: inherit;
       border: none;
       font-size: 20px;
+      text-align: left;
     }
   }
 }

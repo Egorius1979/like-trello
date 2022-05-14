@@ -1,5 +1,5 @@
 <template>
-  <div id="container">
+  <div class="container">
     <column-page
       v-for="column in columns"
       :key="column.name"
@@ -33,7 +33,7 @@ export default {
 </script>
 
 <style lang="scss">
-#container {
+.container {
   display: flex;
   justify-content: space-between;
   width: 70%;

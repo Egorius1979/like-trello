@@ -24,9 +24,12 @@ export default new Vuex.Store({
       state.jwt = data.token;
       console.log(state.jwt);
     },
-    setCard(state, card) {
+    setCards(state, card) {
       state.cards = [...state.cards, card];
       console.log(state.cards);
+    },
+    deleteCard(state, id) {
+      state.cards = state.cards.filter((card) => card.id !== id);
     },
   },
   actions: {
@@ -41,7 +44,14 @@ export default new Vuex.Store({
       };
       axios
         .post(`${uri}/cards/`, payload, { headers })
-        .then((res) => commit("setCard", res.data));
+        .then((res) => commit("setCards", res.data));
+    },
+    removeTodo({ state, commit }, id) {
+      const headers = {
+        Authorization: `JWT ${state.jwt}`,
+      };
+      axios.delete(`${uri}/cards/${id}`, { headers });
+      return commit("deleteCard", id);
     },
   },
   modules: {},

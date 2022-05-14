@@ -4,7 +4,8 @@
       {{ column.name }} ({{ amount }})
     </div>
     <div class="card" v-for="card in cards" :key="card.id">
-      <p>id: {{ card.id }}</p>
+      <button @click="remove(card.id)">X</button>
+      <div><span>id:</span> {{ card.id }}</div>
       <p>{{ card.text }}</p>
     </div>
     <textarea
@@ -18,7 +19,7 @@
       <div class="add" :class="{ 'active-add': isAdded }" @click="add">
         <span>+</span> Добавить карточку
       </div>
-      <button @click="remove" v-show="isAdded">X</button>
+      <button @click="cancel" v-show="isAdded">X</button>
     </div>
   </div>
 </template>
@@ -46,8 +47,11 @@ export default {
       }
       this.isAdded = true;
     },
-    remove() {
+    cancel() {
       this.isAdded = false;
+    },
+    remove(id) {
+      this.$store.dispatch("removeTodo", id);
     },
   },
   computed: {
@@ -61,7 +65,7 @@ export default {
 <style lang="scss" scoped>
 .column {
   width: 100%;
-  margin: 0 10px;
+  margin: 0 20px;
   text-align: left;
 
   > div:not(.add-field),
@@ -69,10 +73,14 @@ export default {
     padding: 10px;
   }
 
+  textarea,
+  .card span {
+    color: #fff;
+  }
+
   textarea {
     border: 10px solid #272930;
     background: #535353;
-    color: white;
     width: 100%;
     resize: none;
     box-sizing: border-box;
@@ -83,9 +91,23 @@ export default {
     }
   }
 
+  .card,
+  .card button {
+    color: #a9a9a9;
+  }
+
   .card {
+    position: relative;
     background: #000;
     border: 10px solid #272930;
+
+    button {
+      position: absolute;
+      top: 5px;
+      right: 0;
+      background: inherit;
+      border: none;
+    }
   }
   .add-field {
     background: #272930;

@@ -11,7 +11,8 @@
     <label for="pass"> пароль: </label>
     <input id="pass" type="password" placeholder="*****" v-model="password" />
     <button type="submit">отправить</button>
-    {{ error }}
+    {{ error || loginError }}
+    <!-- {{ loginError }} -->
   </form>
 </template>
 
@@ -35,10 +36,26 @@ export default {
         this.error = "неверный формат";
         return;
       }
+      this.error = "";
       this.$store.dispatch("login", {
         username: this.login,
         password: this.password,
       });
+    },
+  },
+  computed: {
+    loginError() {
+      return this.$store.state.loginError;
+    },
+    token() {
+      return this.$store.state.jwt;
+    },
+  },
+  watch: {
+    token() {
+      if (this.token && !this.loginError) {
+        this.$router.push("/");
+      }
     },
   },
 };

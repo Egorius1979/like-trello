@@ -1,9 +1,19 @@
 <template>
-  <div class="column">
+  <div
+    class="column"
+    @drop.prevent="onDrop($event, column.num)"
+    @dragover.prevent
+  >
     <div :style="{ backgroundColor: column.color }">
       {{ column.name }} ({{ amount }})
     </div>
-    <div class="card" v-for="card in cards" :key="card.id">
+    <div
+      class="card"
+      v-for="card in cards"
+      :key="card.id"
+      draggable="true"
+      @dragstart="onDragStart($event, card)"
+    >
       <button @click="remove(card.id)">X</button>
       <div><span>id:</span> {{ card.id }}</div>
       <p>{{ card.text }}</p>
@@ -27,7 +37,10 @@
 <script>
 export default {
   name: "ColumnPage",
-  props: { column: Object, cards: Array },
+  props: {
+    column: Object,
+  },
+
   data() {
     return {
       isAdded: false,
@@ -53,8 +66,21 @@ export default {
     remove(id) {
       this.$store.dispatch("removeTodo", id);
     },
+    onDragStart(e, card) {
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("cardId", String(card.id));
+    },
+    onDrop(e, row) {
+      const cardId = +e.dataTransfer.getData("cardId");
+      this.$store.dispatch("chanceDroppedCard", { cardId, row });
+    },
   },
   computed: {
+    cards() {
+      return this.$store.state.cards.filter(
+        (card) => card.row === this.column.num
+      );
+    },
     amount() {
       return this.cards.length;
     },
@@ -100,6 +126,7 @@ export default {
     position: relative;
     background: #000;
     border: 10px solid #272930;
+    overflow-wrap: break-word;
 
     button {
       position: absolute;
@@ -114,6 +141,11 @@ export default {
     display: flex;
     font-size: 1.2rem;
 
+    .active-add,
+    button {
+      color: #a9a9a9;
+    }
+
     .add {
       width: 70%;
       border: 10px solid #272930;
@@ -125,7 +157,6 @@ export default {
     }
     .active-add {
       background: #535353;
-      color: #a9a9a9;
       padding: 15px 0;
       text-align: center;
 
@@ -137,7 +168,6 @@ export default {
     button {
       width: 30%;
       padding-left: 20px;
-      color: #a9a9a9;
       background: inherit;
       border: none;
       font-size: 20px;

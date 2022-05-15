@@ -1,11 +1,14 @@
 <template>
-  <div class="container">
-    <column-page
-      v-for="column in columns"
-      :key="column.name"
-      :column="column"
-      :cards="cards.filter((card) => card.row === column.num)"
-    />
+  <div>
+    <button @click="logout">Выйти</button>
+    {{ error }}
+    <div class="container">
+      <column-page
+        v-for="column in columns"
+        :key="column.name"
+        :column="column"
+      />
+    </div>
   </div>
 </template>
 
@@ -25,8 +28,14 @@ export default {
     };
   },
   computed: {
-    cards() {
-      return this.$store.state.cards;
+    error() {
+      return this.$store.state.error;
+    },
+  },
+  methods: {
+    logout() {
+      this.$store.commit("logout");
+      this.$router.push("/login");
     },
   },
 };
@@ -34,9 +43,27 @@ export default {
 
 <style lang="scss">
 .container {
-  display: flex;
-  justify-content: space-between;
-  width: 70%;
-  margin: 50px auto;
+  display: grid;
+  justify-items: center;
+  grid-template-columns: 1fr;
+  grid-column-gap: 32px;
+  grid-row-gap: 32px;
+  margin: 10px auto;
+  @media (min-width: 425px) {
+    width: 70%;
+  }
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    width: 90%;
+    margin: 30px auto;
+  }
+  @media (min-width: 1024px) {
+    width: 100%;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin: 50px auto;
+  }
+  @media (min-width: 1440px) {
+    width: 70%;
+  }
 }
 </style>

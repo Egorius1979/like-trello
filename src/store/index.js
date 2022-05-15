@@ -29,8 +29,8 @@ export default new Vuex.Store({
       state.loginError = "";
       state.jwt = data.token;
     },
-    SET_CARDS(state, card) {
-      state.cards = [...state.cards, card];
+    SET_CARDS(state, cards) {
+      state.cards = cards;
     },
     DELETE_CARD(state, id) {
       state.cards = state.cards.filter((card) => card.id !== id);
@@ -66,26 +66,43 @@ export default new Vuex.Store({
         .then((res) => commit("SET_JWT", res.data))
         .catch(() => commit("SET_ERROR", null));
     },
-    addTodo({ state, commit }, payload) {
+    addTodo({ state, commit, dispatch }, payload) {
       const headers = {
         Authorization: `JWT ${state.jwt}`,
       };
       axios
         .post(`${uri}/cards/`, payload, { headers })
-        .then((res) => commit("SET_CARDS", res.data))
+        .then(() => dispatch("getCards"))
         .catch((e) => commit("SET_ERROR", e));
     },
-    removeTodo({ commit, state }, id) {
+    removeTodo({ commit, dispatch, state }, id) {
       const headers = {
         Authorization: `JWT ${state.jwt}`,
       };
       axios
         .delete(`${uri}/cards/${id}`, { headers })
-        .then(() => commit("DELETE_CARD", id))
+        .then(() => dispatch("getCards"))
         .catch((e) => commit("SET_ERROR", e));
     },
-    chanceDroppedCard({ commit }, payload) {
-      commit("CHANGE_DROPPED_CARD", payload);
+    changeDroppedCard({ commit, dispatch, state }, payload) {
+      // console.log(updatedCard);
+      // commit("CHANGE_DROPPED_CARD", payload);
+      const headers = {
+        Authorization: `JWT ${state.jwt}`,
+      };
+      axios
+        .patch(`${uri}/cards/${payload.cardId}`, payload.newCard, { headers })
+        .then(() => dispatch("getCards"))
+        .catch((e) => commit("SET_ERROR", e));
+    },
+    getCards({ commit, state }) {
+      const headers = {
+        Authorization: `JWT ${state.jwt}`,
+      };
+      axios
+        .get(`${uri}/cards/`, { headers })
+        .then((res) => commit("SET_CARDS", res.data))
+        .catch((e) => commit("SET_ERROR", e));
     },
   },
   modules: {},

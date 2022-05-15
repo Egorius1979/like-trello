@@ -1,8 +1,8 @@
 <template>
   <div
     class="column"
-    @drop.prevent="onDrop($event, column.num)"
     @dragover.prevent
+    @drop.prevent="onColumnDrop($event, column.num)"
   >
     <div :style="{ backgroundColor: column.color }">
       {{ column.name }} ({{ amount }})
@@ -13,6 +13,9 @@
       :key="card.id"
       draggable="true"
       @dragstart="onDragStart($event, card)"
+      @dragover.prevent="onDragOver($event)"
+      @dragleave="onDragLeave($event)"
+      @drop.prevent="onDrop($event, card)"
     >
       <button @click="remove(card.id)">X</button>
       <div><span>id:</span> {{ card.id }}</div>
@@ -45,7 +48,18 @@ export default {
     return {
       isAdded: false,
       todoText: "",
+      // currentCard: {},
     };
+  },
+  computed: {
+    cards() {
+      return this.$store.state.cards.filter(
+        (card) => card.row === this.column.num
+      );
+    },
+    amount() {
+      return this.cards.length;
+    },
   },
   methods: {
     add() {
@@ -66,23 +80,43 @@ export default {
     remove(id) {
       this.$store.dispatch("removeTodo", id);
     },
-    onDragStart(e, card) {
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("cardId", String(card.id));
+    onDragStart(e, currentCard) {
+      const dt = e.dataTransfer;
+      dt.setData("cardId", String(currentCard.id));
+      dt.setData("CardText", currentCard.text);
     },
-    onDrop(e, row) {
-      const cardId = +e.dataTransfer.getData("cardId");
-      this.$store.dispatch("chanceDroppedCard", { cardId, row });
+    onDrop(e, card) {
+      const dt = e.dataTransfer;
+      const cardId = +dt.getData("cardId");
+      const cardText = dt.getData("CardText");
+      const newCard = {
+        row: card.row,
+        seq_num: card.seq_num,
+        text: cardText,
+      };
+      this.$store.dispatch("changeDroppedCard", { cardId, newCard });
+      e.target.style.opacity = "1";
     },
-  },
-  computed: {
-    cards() {
-      return this.$store.state.cards.filter(
-        (card) => card.row === this.column.num
-      );
+    onDragOver(e) {
+      if (e.target.className === "card") {
+        e.target.style.opacity = "0.5";
+      }
     },
-    amount() {
-      return this.cards.length;
+    onDragLeave(e) {
+      e.target.style.opacity = "1";
+    },
+    onColumnDrop(e, row) {
+      if (!this.amount) {
+        const dt = e.dataTransfer;
+        const cardId = +dt.getData("cardId");
+        const cardText = dt.getData("CardText");
+        const newCard = {
+          row,
+          seq_num: 0,
+          text: cardText,
+        };
+        this.$store.dispatch("changeDroppedCard", { cardId, newCard });
+      }
     },
   },
 };
@@ -173,6 +207,9 @@ export default {
       font-size: 20px;
       text-align: left;
     }
+  }
+  .addField {
+    height: 50px;
   }
 }
 </style>

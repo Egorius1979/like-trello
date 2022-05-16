@@ -1,8 +1,8 @@
 <template>
   <div>
     <nav>
-      <router-link to="/reg">Регистрация</router-link> |
-      <router-link to="/login">Войти</router-link>
+      <router-link to="/login">Войти</router-link> |
+      <router-link to="/reg">Регистрация</router-link>
     </nav>
     <form @submit.prevent="verify">
       <label for="login">
@@ -58,6 +58,10 @@ export default {
         this.error = "неверный формат логина";
         return;
       }
+      if (!/.{8,}/gim.test(this.password)) {
+        this.error = "пароль не менее 8 символов";
+        return;
+      }
       if (this.email && !/^.+@.+\..{2,}$/gim.test(this.email)) {
         this.error = "неверный формат email";
         return;
@@ -70,6 +74,7 @@ export default {
           email: this.email,
           password: this.password,
         });
+        return;
       }
       this.$store.dispatch("login", {
         username: this.login,

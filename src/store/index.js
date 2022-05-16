@@ -67,6 +67,7 @@ export default new Vuex.Store({
   },
   actions: {
     registration({ commit, dispatch }, payload) {
+      console.log(payload);
       axios
         .post(`${uri}/users/create/`, payload)
         .then((res) => commit("SET_JWT", res.data))

@@ -19,6 +19,7 @@ export default new Vuex.Store({
     cards: [],
     error: "",
     loginError: "",
+    headers: null,
   },
   getters: {},
   mutations: {
@@ -28,6 +29,7 @@ export default new Vuex.Store({
       }
       state.loginError = "";
       state.jwt = data.token;
+      state.headers = { Authorization: `JWT ${state.jwt}` };
     },
     SET_CARDS(state, cards) {
       if (state.error) {
@@ -63,6 +65,7 @@ export default new Vuex.Store({
       state.cards = [];
       state.error = "";
       state.loginError = "";
+      state.headers = null;
     },
   },
   actions: {
@@ -82,40 +85,28 @@ export default new Vuex.Store({
         .catch(() => commit("SET_ERROR", null));
     },
     addTodo({ state, commit, dispatch }, payload) {
-      const headers = {
-        Authorization: `JWT ${state.jwt}`,
-      };
       axios
-        .post(`${uri}/cards/`, payload, { headers })
+        .post(`${uri}/cards/`, payload, { headers: state.headers })
         .then(() => dispatch("getCards"))
         .catch((e) => commit("SET_ERROR", e));
     },
     removeTodo({ commit, dispatch, state }, id) {
-      const headers = {
-        Authorization: `JWT ${state.jwt}`,
-      };
       axios
-        .delete(`${uri}/cards/${id}`, { headers })
+        .delete(`${uri}/cards/${id}`, { headers: state.headers })
         .then(() => dispatch("getCards"))
         .catch((e) => commit("SET_ERROR", e));
     },
     changeDroppedCard({ commit, dispatch, state }, payload) {
-      const headers = {
-        Authorization: `JWT ${state.jwt}`,
-      };
       axios
         .patch(`${uri}/cards/${payload.cardId}`, payload.updatedCard, {
-          headers,
+          headers: state.headers,
         })
         .then(() => dispatch("getCards"))
         .catch((e) => commit("SET_ERROR", e));
     },
     getCards({ commit, state }) {
-      const headers = {
-        Authorization: `JWT ${state.jwt}`,
-      };
       axios
-        .get(`${uri}/cards/`, { headers })
+        .get(`${uri}/cards/`, { headers: state.headers })
         .then((res) => commit("SET_CARDS", res.data))
         .catch((e) => commit("SET_ERROR", e));
     },

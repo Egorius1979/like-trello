@@ -1,19 +1,39 @@
 <template>
-  <form @submit.prevent="verify">
-    <label for="login"> логин: </label>
-    <input
-      autofocus
-      id="login"
-      type="text"
-      placeholder="ваш логин"
-      v-model="login"
-    />
-    <label for="pass"> пароль: </label>
-    <input id="pass" type="password" placeholder="*****" v-model="password" />
-    <button type="submit">отправить</button>
-    {{ error || loginError }}
-    <!-- {{ loginError }} -->
-  </form>
+  <div>
+    <nav>
+      <router-link to="/reg">Регистрация</router-link> |
+      <router-link to="/login">Войти</router-link>
+    </nav>
+    <form @submit.prevent="verify">
+      <label for="login">
+        логин:
+        <span :class="{ required: isNotRegistered }">*</span>
+      </label>
+      <input
+        autofocus
+        id="login"
+        type="text"
+        placeholder="ваш логин"
+        v-model="login"
+      />
+      <template v-if="isNotRegistered">
+        <label for="email">e-mail: </label>
+        <input
+          id="email"
+          type="text"
+          placeholder="адрес электронной почты"
+          v-model="email"
+        />
+      </template>
+      <label for="pass">
+        пароль:
+        <span :class="{ required: isNotRegistered }">*</span>
+      </label>
+      <input id="pass" type="password" placeholder="*****" v-model="password" />
+      <button type="submit">отправить</button>
+      <div class="error">{{ error || loginError }}</div>
+    </form>
+  </div>
 </template>
 
 <script>
@@ -23,7 +43,9 @@ export default {
     return {
       login: "",
       password: "",
+      email: "",
       error: "",
+      isNotRegistered: this.$route.name === "registration",
     };
   },
   methods: {
@@ -33,10 +55,22 @@ export default {
         return;
       }
       if (!/^[\w.@+-]+$/.test(this.login)) {
-        this.error = "неверный формат";
+        this.error = "неверный формат логина";
+        return;
+      }
+      if (this.email && !/^.+@.+\..{2,}$/gim.test(this.email)) {
+        this.error = "неверный формат email";
         return;
       }
       this.error = "";
+
+      if (this.isNotRegistered) {
+        this.$store.dispatch("registration", {
+          username: this.login,
+          email: this.email,
+          password: this.password,
+        });
+      }
       this.$store.dispatch("login", {
         username: this.login,
         password: this.password,
@@ -57,6 +91,11 @@ export default {
         this.$router.push("/");
       }
     },
+    $route() {
+      if (this.$route.name === "login") {
+        this.isNotRegistered = false;
+      } else this.isNotRegistered = true;
+    },
   },
 };
 </script>
@@ -72,6 +111,17 @@ form {
 
   label {
     text-align: left;
+  }
+
+  span {
+    visibility: hidden;
+  }
+
+  .required {
+    visibility: visible;
+    color: red;
+    font-size: 95%;
+    top: -2px;
   }
 
   input,
@@ -104,16 +154,21 @@ form {
     &:hover {
       border: none;
       box-shadow: 1px 1px 2px #00ff7f;
+      margin-bottom: 2px;
     }
 
     &:active {
-      position: relative;
       top: 1px;
       left: 1px;
       box-shadow: none;
       opacity: 0.8;
       border: 1px solid black;
+      margin-bottom: 0;
     }
+  }
+
+  .error {
+    margin: 10px auto;
   }
 }
 </style>

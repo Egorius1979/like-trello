@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="column"
-    @dragover.prevent
-    @drop.prevent="onColumnDrop($event, column.num)"
-  >
+  <div class="column" @dragover.prevent @drop.prevent="onColumnDrop($event)">
     <div :style="{ backgroundColor: column.color }">
       {{ column.name }} ({{ amount }})
     </div>
@@ -23,17 +19,18 @@
     </div>
     <textarea
       name="todo"
-      rows="10"
+      rows="5"
       placeholder="Ввести заголовок для этой карточки"
       v-model="todoText"
       v-show="isAdded"
     />
-    <div class="add-field">
+    <div id="add-field" class="add-field">
       <div class="add" :class="{ 'active-add': isAdded }" @click="add">
         <span>+</span> Добавить карточку
       </div>
       <button @click="cancel" v-show="isAdded">X</button>
     </div>
+    <div id="add-drop-field" />
   </div>
 </template>
 
@@ -48,7 +45,6 @@ export default {
     return {
       isAdded: false,
       todoText: "",
-      // currentCard: {},
     };
   },
   computed: {
@@ -63,7 +59,7 @@ export default {
   },
   methods: {
     add() {
-      if (this.isAdded) {
+      if (this.isAdded && this.todoText) {
         this.$store.dispatch("addTodo", {
           row: this.column.num,
           text: this.todoText,
@@ -89,13 +85,18 @@ export default {
       const dt = e.dataTransfer;
       const cardId = +dt.getData("cardId");
       const cardText = dt.getData("CardText");
-      const newCard = {
-        row: card.row,
-        seq_num: card.seq_num,
+      const new_seq_num = this.cards.find((card) => card.id === cardId)
+        ? this.amount - 1
+        : this.amount;
+      const updatedCard = {
+        row: card ? card.row : this.column.num,
+        seq_num: card ? card.seq_num : new_seq_num,
         text: cardText,
       };
-      this.$store.dispatch("changeDroppedCard", { cardId, newCard });
-      e.target.style.opacity = "1";
+      this.$store.dispatch("changeDroppedCard", { cardId, updatedCard });
+      if (card) {
+        e.target.style.opacity = "1";
+      }
     },
     onDragOver(e) {
       if (e.target.className === "card") {
@@ -105,17 +106,9 @@ export default {
     onDragLeave(e) {
       e.target.style.opacity = "1";
     },
-    onColumnDrop(e, row) {
-      if (!this.amount) {
-        const dt = e.dataTransfer;
-        const cardId = +dt.getData("cardId");
-        const cardText = dt.getData("CardText");
-        const newCard = {
-          row,
-          seq_num: 0,
-          text: cardText,
-        };
-        this.$store.dispatch("changeDroppedCard", { cardId, newCard });
+    onColumnDrop(e) {
+      if (e.target.id === "add-drop-field" || e.target.className === "add") {
+        this.onDrop(e);
       }
     },
   },
@@ -134,12 +127,17 @@ export default {
   }
 
   textarea,
+  .card,
+  .add {
+    border: 10px solid #272930;
+  }
+
+  textarea,
   .card span {
     color: #fff;
   }
 
   textarea {
-    border: 10px solid #272930;
     background: #535353;
     width: 100%;
     resize: none;
@@ -159,8 +157,8 @@ export default {
   .card {
     position: relative;
     background: #000;
-    border: 10px solid #272930;
-    overflow-wrap: break-word;
+    border-bottom: none;
+    word-break: break-all;
 
     button {
       position: absolute;
@@ -182,7 +180,6 @@ export default {
 
     .add {
       width: 70%;
-      border: 10px solid #272930;
       padding: 10px 0 0;
       background: #272930;
       color: gray;
@@ -208,8 +205,11 @@ export default {
       text-align: left;
     }
   }
-  .addField {
-    height: 50px;
+  #add-drop-field {
+    height: 10px;
+    @media (min-width: 1439.98px) {
+      height: 30px;
+    }
   }
 }
 </style>

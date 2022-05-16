@@ -30,9 +30,15 @@ export default new Vuex.Store({
       state.jwt = data.token;
     },
     SET_CARDS(state, cards) {
+      if (state.error) {
+        state.error = "";
+      }
       state.cards = cards;
     },
     DELETE_CARD(state, id) {
+      if (state.error) {
+        state.error = "";
+      }
       state.cards = state.cards.filter((card) => card.id !== id);
     },
     SET_ERROR(state, err) {
@@ -52,18 +58,26 @@ export default new Vuex.Store({
         return card;
       });
     },
-    logout(state) {
+    LOG_OUT(state) {
       state.jwt = "";
-      // state.cards = [];
+      state.cards = [];
       state.error = "";
       state.loginError = "";
     },
   },
   actions: {
-    login({ commit }, payload) {
+    registration({ commit, dispatch }, payload) {
+      axios
+        .post(`${uri}/users/create/`, payload)
+        .then((res) => commit("SET_JWT", res.data))
+        .then(() => dispatch("getCards"))
+        .catch(() => commit("SET_ERROR", null));
+    },
+    login({ commit, dispatch }, payload) {
       axios
         .post(`${uri}/users/login/`, payload)
         .then((res) => commit("SET_JWT", res.data))
+        .then(() => dispatch("getCards"))
         .catch(() => commit("SET_ERROR", null));
     },
     addTodo({ state, commit, dispatch }, payload) {
@@ -85,13 +99,13 @@ export default new Vuex.Store({
         .catch((e) => commit("SET_ERROR", e));
     },
     changeDroppedCard({ commit, dispatch, state }, payload) {
-      // console.log(updatedCard);
-      // commit("CHANGE_DROPPED_CARD", payload);
       const headers = {
         Authorization: `JWT ${state.jwt}`,
       };
       axios
-        .patch(`${uri}/cards/${payload.cardId}`, payload.newCard, { headers })
+        .patch(`${uri}/cards/${payload.cardId}`, payload.updatedCard, {
+          headers,
+        })
         .then(() => dispatch("getCards"))
         .catch((e) => commit("SET_ERROR", e));
     },

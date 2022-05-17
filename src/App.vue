@@ -5,10 +5,6 @@
 </template>
 
 <style lang="scss">
-html {
-  font-size: 16px;
-}
-
 body {
   background-color: #2f333a;
 }

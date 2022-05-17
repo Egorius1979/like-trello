@@ -37,12 +37,6 @@ export default new Vuex.Store({
       }
       state.cards = cards;
     },
-    DELETE_CARD(state, id) {
-      if (state.error) {
-        state.error = "";
-      }
-      state.cards = state.cards.filter((card) => card.id !== id);
-    },
     SET_ERROR(state, err) {
       if (err) {
         state.loginError = "";
@@ -51,14 +45,6 @@ export default new Vuex.Store({
       }
       state.error = "";
       state.loginError = "Неверный логин или пароль";
-    },
-    CHANGE_DROPPED_CARD(state, payload) {
-      state.cards = state.cards.map((card) => {
-        if (card.id === payload.cardId) {
-          card.row = payload.row;
-        }
-        return card;
-      });
     },
     LOG_OUT(state) {
       state.jwt = "";
@@ -84,6 +70,12 @@ export default new Vuex.Store({
         .then(() => dispatch("getCards"))
         .catch(() => commit("SET_ERROR", null));
     },
+    getCards({ commit, state }) {
+      axios
+        .get(`${uri}/cards/`, { headers: state.headers })
+        .then((res) => commit("SET_CARDS", res.data))
+        .catch((e) => commit("SET_ERROR", e));
+    },
     addTodo({ state, commit, dispatch }, payload) {
       axios
         .post(`${uri}/cards/`, payload, { headers: state.headers })
@@ -102,12 +94,6 @@ export default new Vuex.Store({
           headers: state.headers,
         })
         .then(() => dispatch("getCards"))
-        .catch((e) => commit("SET_ERROR", e));
-    },
-    getCards({ commit, state }) {
-      axios
-        .get(`${uri}/cards/`, { headers: state.headers })
-        .then((res) => commit("SET_CARDS", res.data))
         .catch((e) => commit("SET_ERROR", e));
     },
   },

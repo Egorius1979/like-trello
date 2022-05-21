@@ -47,12 +47,17 @@ header {
     margin-right: 20px;
   }
 
+  .exit-btn,
+  .b-icon,
+  .b-btn {
+    cursor: pointer;
+  }
+
   .exit-btn {
     padding: 5px 15px;
     background-color: #60467e;
     color: #fff;
     border-radius: 5px;
-    cursor: pointer;
     display: none;
     @media (min-width: 575.98px) {
       display: inline;

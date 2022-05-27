@@ -23,7 +23,7 @@ export default {
   methods: {
     logout() {
       this.$store.commit("LOG_OUT");
-      this.$router.push({ name: "login" });
+      this.$router.push("/login");
     },
     menuHandler() {
       this.isOpened = !this.isOpened;

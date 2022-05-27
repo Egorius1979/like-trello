@@ -1,8 +1,8 @@
 <template>
   <div>
     <nav>
-      <router-link :to="{ name: 'login' }">Войти</router-link> |
-      <router-link :to="{ name: 'registration' }">Регистрация</router-link>
+      <router-link to="/login">Войти</router-link> |
+      <router-link to="/reg">Регистрация</router-link>
     </nav>
     <form @submit.prevent="verify">
       <label for="login">

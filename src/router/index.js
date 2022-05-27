@@ -7,20 +7,16 @@ Vue.use(VueRouter);
 const routes = [
   {
     path: "/",
-    redirect: { name: "home" },
-  },
-  {
-    path: "/like-trello/",
     name: "home",
     component: MainPage,
   },
   {
-    path: "/like-trello/login",
+    path: "/login",
     name: "login",
     component: () => import("../components/AuthPage.vue"),
   },
   {
-    path: "/like-trello/reg",
+    path: "/reg",
     name: "registration",
     component: () => import("../components/AuthPage.vue"),
   },

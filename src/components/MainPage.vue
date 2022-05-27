@@ -30,7 +30,7 @@ export default {
   },
   mounted() {
     if (!this.$store.state.jwt) {
-      this.$router.push("/login");
+      this.$router.push({ name: "login" });
     }
   },
   computed: {

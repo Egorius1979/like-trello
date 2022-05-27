@@ -3,20 +3,22 @@
     <div :style="{ backgroundColor: column.color }">
       {{ column.name }} ({{ amount }})
     </div>
-    <div
-      class="card"
-      v-for="card in cards"
-      :key="card.id"
-      draggable="true"
-      @dragstart="onDragStart($event, card)"
-      @dragover.prevent="onDragOver($event)"
-      @dragleave="onDragLeave($event)"
-      @drop.prevent="onDrop($event, card)"
-    >
-      <button @click="remove(card.id)">X</button>
-      <div><span>id:</span> {{ card.id }}</div>
-      <p>{{ card.text }}</p>
-    </div>
+    <transition-group name="list" class="trans" tag="div">
+      <div
+        class="card"
+        v-for="card in cards"
+        :key="card.id"
+        draggable="true"
+        @dragstart="onDragStart($event, card)"
+        @dragover.prevent="onDragOver($event)"
+        @dragleave="onDragLeave($event)"
+        @drop.prevent="onDrop($event, card)"
+      >
+        <button @click="remove(card.id)">X</button>
+        <div><span>id:</span> {{ card.id }}</div>
+        <p>{{ card.text }}</p>
+      </div>
+    </transition-group>
     <textarea
       name="todo"
       rows="5"
@@ -121,7 +123,8 @@ export default {
   margin: 0 20px;
   text-align: left;
 
-  > div:not(.add-field),
+  div:first-child,
+  .card,
   textarea {
     padding: 10px;
   }
@@ -210,6 +213,18 @@ export default {
     @media (min-width: 1439.98px) {
       height: 30px;
     }
+  }
+  .list-enter-active,
+  .list-leave-active,
+  .list-move {
+    transition: all 1s;
+  }
+  .list-enter {
+    transform: translateY(30px);
+  }
+  .list-leave-to {
+    background-color: #272930;
+    color: #272930;
   }
 }
 </style>

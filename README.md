@@ -3,10 +3,11 @@
 Небольшая наглядная реализация **_Drag’n’Drop_**.
 С регистрацией, авторизацией, сохранением всех манипуляций при обновлении страницы.
 
-**Стек:**
+**Использовал:**
 
-- Vue2/Vuex/Vue Router
-- SCSS/Grid/Flex
+- vue2/vuex/vue-router/vuex-persist;
+- scss/grid/flex;
+- axios.
 
 ## Project setup
 

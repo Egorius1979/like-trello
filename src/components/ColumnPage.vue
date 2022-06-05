@@ -217,7 +217,7 @@ export default {
   .list-enter-active,
   .list-leave-active,
   .list-move {
-    transition: all 1s;
+    transition: all 0.7s;
   }
   .list-enter {
     transform: translateY(30px);
